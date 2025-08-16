@@ -1,0 +1,36 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+defaults:
+  run:
+
+    working-directory: ci-template
+
+jobs:
+  build-test-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: ci-template/package-lock.json
+
+      - name: Debug
+        run: |
+          node -v
+          npm -v
+          pwd
+          ls -la
+          test -f package.json && echo "package.json OK" || echo "NO package.json"
+          test -f package-lock.json && echo "package-lock.json OK" || echo "NO package-lock.json"
+
+      - run: npm ci
+      - run: npm run lint
+      - run: npm test
+
